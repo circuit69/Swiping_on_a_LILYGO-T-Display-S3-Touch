@@ -106,6 +106,6 @@ void moveBall() {
       dirY = 0;
     }
   }
-  x += dirX;
+  x += dirX;        //add directions to move the ball
   y += dirY;
 }
