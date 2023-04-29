@@ -42,6 +42,7 @@ void setup(void) {
 
   tft.init();                   //setup the tft display
   tft.setRotation(3);           //USB on left
+  //the touch screen is not rotated, you need handle orientation yourself in code
   scrn.createSprite(320, 170);  //a sprite for smooth graphics
   Wire.begin(PIN_IIC_SDA, PIN_IIC_SCL);   //needed for the touch screen
 }
@@ -51,7 +52,10 @@ void loop() {
     TP_Point t = touch.getPoint(0);   //load the x,y coordinates
     if (!touching) {    //check if the flag "touching" is false
       touching = true;  //the screen is actively touched
+        //this is handling the orientation of the touch screen to the display
+        //tx1 is the display orientation = t.y the touchscreen orientation
       tx1 = t.y;        //first touch coordinates
+        //ty1 is the display orientation = t.x the touchscreen reversed orientation
       ty1 = -t.x;
     } else {            //if "touching" is true
       tx2 = t.y;        //get the last coordinates
