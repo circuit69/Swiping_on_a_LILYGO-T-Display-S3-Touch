@@ -45,8 +45,8 @@ void loop() {
     TP_Point t = touch.getPoint(0);   //load the x,y coordinates
     tft.fillScreen(TFT_BLACK);
     tft.drawCentreString("Raw", 80, 20, 4);         //raw touch screen coordinates
-    tft.drawCentreString("X=" + String(t.x), 80, 60, 4);
-    tft.drawCentreString("Y=" + String(t.y), 80, 100, 4);
+    tft.drawCentreString("X=" + String(t.x), 80, 60, 4);  //t.x is the value from the touch screen
+    tft.drawCentreString("Y=" + String(t.y), 80, 100, 4); //t.y value from the touch screen
     tft.drawCentreString("Oriented", 240, 20, 4);   //reoriented touch screen coordinates
     tft.drawCentreString("X=" + String(320 - t.y), 240, 60, 4);
     tft.drawCentreString("Y=" + String(t.x), 240, 100, 4);
