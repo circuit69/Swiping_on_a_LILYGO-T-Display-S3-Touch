@@ -3,15 +3,13 @@
    let's push a dot around the screen
 *********************************************************/
 #define TOUCH_MODULES_CST_SELF
-//#include "Arduino.h"
 #include "TFT_eSPI.h"
 #include "TouchLib.h"
 #include "Wire.h"
-//#include <TFT_eSPI.h>
-//#include <SPI.h>
 TFT_eSPI tft = TFT_eSPI();
 TFT_eSprite scrn = TFT_eSprite(&tft);
 
+//some of the more important pins on the t-display-s3
 #define PIN_BUTTON_1                 0
 #define PIN_BUTTON_2                 14
 #define PIN_BAT_VOLT                 4
@@ -22,17 +20,19 @@ TFT_eSprite scrn = TFT_eSprite(&tft);
 #define PIN_TOUCH_INT                16
 #define PIN_TOUCH_RES                21
 
+//Initialize the touch screen
 TouchLib touch(Wire, PIN_IIC_SDA, PIN_IIC_SCL, CTS820_SLAVE_ADDRESS, PIN_TOUCH_RES);
 
-int x = 50, lastX = x, dirX,    //dot variables
-    y = 50, lastY = y, dirY,
-    drag = 2, minSwipe = 20,
-    tx1, ty1, tx2, ty2;         //touch screen variables
+int x = 50, dirX,    //dot variables
+    y = 50, dirY,
+    drag = 2,
+    tx1, ty1,         //first touch vairiable
+    tx2, ty2;         //last touch variables when lifting
 
-bool touching = false;
+bool touching = false;          //flag if screen is activly touched
 
 void setup(void) {
-  //The two buttons on the board
+  //The two buttons on the board (setup but not used in this sketch)
   pinMode(PIN_BUTTON_1, INPUT);
   pinMode(PIN_BUTTON_2, INPUT);
 
@@ -40,28 +40,26 @@ void setup(void) {
   pinMode(PIN_POWER_ON, OUTPUT);
   digitalWrite(PIN_POWER_ON, HIGH);
 
-  tft.init();
-  tft.setRotation(3);         //USB on left
-  //tft.fillScreen(TFT_BLACK);
-  scrn.createSprite(320, 170);
-  //scrn.fillSprite(TFT_BLACK);
-  Wire.begin(PIN_IIC_SDA, PIN_IIC_SCL);
+  tft.init();                   //setup the tft display
+  tft.setRotation(3);           //USB on left
+  scrn.createSprite(320, 170);  //a sprite for smooth graphics
+  Wire.begin(PIN_IIC_SDA, PIN_IIC_SCL);   //needed for the touch screen
 }
 
 void loop() {
-  if (touch.read()) {
-    TP_Point t = touch.getPoint(0);
-    if (!touching) {
-      touching = true;
-      tx1 = t.y;        //first touch
+  if (touch.read()) {   //check if the screen is touched
+    TP_Point t = touch.getPoint(0);   //load the x,y coordinates
+    if (!touching) {    //check if the flag "touching" is false
+      touching = true;  //the screen is actively touched
+      tx1 = t.y;        //first touch coordinates
       ty1 = -t.x;
-    } else {
-      tx2 = t.y;        //last touch
+    } else {            //if "touching" is true
+      tx2 = t.y;        //get the last coordinates
       ty2 = -t.x;
     }
-  } else if (touching) {  //touch lifted
-    touching = false;
-    dirX = tx1 - tx2;
+  } else if (touching) {  //touch lifted, is "touching" true
+    touching = false;     //then make it false
+    dirX = tx1 - tx2;     //how long was the swipe simple calculation
     dirY = ty1 - ty2;
   }
   moveBall();
@@ -70,9 +68,9 @@ void loop() {
 }
 
 void showScreen() {
-  scrn.fillSprite(TFT_BLACK);
-  scrn.fillCircle(x, y, 4, TFT_CYAN);
-  scrn.pushSprite(0, 0);
+  scrn.fillSprite(TFT_BLACK);           //clear the sprite
+  scrn.fillCircle(x, y, 4, TFT_CYAN);   //draw a dot on the sprite
+  scrn.pushSprite(0, 0);                //push the sprite to the tft screen
 }
 
 void moveBall() {
